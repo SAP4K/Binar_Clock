@@ -22,32 +22,35 @@ void init_first_timing(void)
 {
 	TCCR0B = 0;
 	TCCR0B = (1<<CS01);
-	TCCR1B = (1<<CS11);
+	//TCCR1B = (1<<CS11);
 	TCNT0 = 0;
-	TCNT1 = 0;
+	//TCNT1 = 0;
 	TCCR2B = 0;
 	TCCR2B = (1<<CS21);
 	TCNT2 = 0;
 }
+uint32_t click_cont = 0;
 uint8_t check_button(uint16_t* button_counter,bool *check_if_button_is_pressed)
 {
+	if(click_cont > 1000)
+	{
 		if(!(PIND & (1<<PD2)))
-		{
-			
+		{	
 			(*check_if_button_is_pressed) = false;
-			(*button_counter)++;
-			TCNT1 = 0;
-			
+			(*button_counter)++;		
 		}
+		click_cont = 0;
+	}
+	click_cont++;
 	if((PIND & (1<<PD2)))
 	{
-		if(((*button_counter) > 1)  && ((*button_counter) < 65500))
+		if(((*button_counter) > 1)  && ((*button_counter) < 50))
 		{
 			(*button_counter) = 0;
 			return 1;
 		}
 	}
-	if((*button_counter)>=65500)
+	if((*button_counter) >= 50)
 	{
 		(*button_counter) = 0;
 		//Transmit_UART_TTL(97);
